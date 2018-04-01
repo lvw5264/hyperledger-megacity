@@ -1,8 +1,12 @@
-# Perishable Goods Network
-
+# Blockchain Smart Contracts in Megacity Logistics: Hyperledger Source Code
+<!--
 > Example business network that shows growers, shippers and importers defining contracts for the price of perishable goods, based on temperature readings received for shipping containers.
 
 The business network defines a contract between growers and importers. The contract stipulates that: On receipt of the shipment the importer pays the grower the unit price x the number of units in the shipment. Shipments that arrive late are free. Shipments that have breached the low temperate threshold have a penalty applied proportional to the magnitude of the breach x a penalty factor. Shipments that have breached the high temperate threshold have a penalty applied proportional to the magnitude of the breach x a penalty factor.
+-->
+## Model Definitions
+
+> Note: Needs to be updated from the perishable network, as it has improved tremendously.
 
 This business network defines:
 
@@ -14,6 +18,10 @@ This business network defines:
 
 **Transactions**
 `TemperatureReading` `ShipmentReceived` `SetupDemo`
+
+## Usage
+
+> Note: Needs to be updated from the perishable network, as it has improved tremendously.
 
 To test this Business Network Definition in the **Test** tab:
 
@@ -51,3 +59,9 @@ Submit a `ShipmentReceived` transaction for `SHIP_001` to trigger the payout to 
 If the date-time of the `ShipmentReceived` transaction is after the `arrivalDateTime` on `CON_001` then the grower will no receive any payment for the shipment.
 
 Congratulations!
+
+## Credits
+
+This implementation is a heavily modified version of the Perishable Goods Template and the Car Auction Template by the Hyperledger Foundation, which are licensed under the Apache 2.0 license. Any additional code is therefore also licensed under Apache 2.0 for Lawrence Wu.
+
+https://github.com/hyperledger/composer-sample-networks/tree/master/packages/perishable-network
