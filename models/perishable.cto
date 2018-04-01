@@ -1,0 +1,202 @@
+/**
+  * A business network for shipping perishable goods
+  * The cargo is temperature controlled and contracts
+  * can be negotiated based on the temperature
+  * readings received for the cargo
+  */
+
+namespace org.acme.shipping.perishable
+import org.acme.product.auction.Product
+/* Business Logic inherited from Perishable */
+
+/**
+ * The status of a shipment
+ */
+enum ShipmentStatus {
+  o CREATED
+  o DOCKED // refers to the truck having arrived at either the supplier or retailer dock, loading or unloading the product.
+  o IN_TRANSIT
+  o ARRIVED   // the shipper has arrived at the retailer
+  o DELIVERED // the retailer accepts the delivery and has paid out
+}
+
+/**
+ * The status of a contract
+ */
+enum ContractState {
+  o INQUIRY // generated shipping inquiry
+  o RESERVE_NOT_MET // offers did not meet maxBid
+  o READY_FOR_PICKUP // bids closed and ready to purchase
+}
+
+/**
+ * An abstract transaction that is related to a Shipment
+ */
+abstract transaction ShipmentTransaction {
+    --> Shipment shipment
+}
+
+/**
+ * An temperature reading for a shipment. E.g. received from a
+ * device within a temperature controlled shipping container
+ */
+transaction TemperatureReading extends ShipmentTransaction {
+  o Double centigrade
+}
+
+/**
+ * The shipper docks at the possessor, which emits a notification
+ * The shipper waits for the possessor to make them the new possessor of the product 
+ */
+transaction Dock extends ShipmentTransaction {
+}
+
+/**
+ * Recipient picks up from possessor, with their signature equivalent 
+ * being a change in state to IN_TRANSIT
+ */
+transaction PickUp extends ShipmentTransaction {
+}
+
+/**
+ * Possessor hands off to recipient, with signature equivalent 
+ * being change of possessor to the recipient.
+ */
+transaction HandOff extends ShipmentTransaction {
+}
+
+/**
+ * The shipper arrives at the retailer, which emits a notification
+ * The shipper waits for the retailer to take possession of the product 
+ */
+transaction Arrive extends ShipmentTransaction {
+}
+
+
+/**
+ * A notification that a shipment has been received by the
+ * retailer and that funds should be transferred from the retailer
+ * to the supplier to pay for the shipment.
+ */
+transaction ShipmentReceived extends ShipmentTransaction {
+}
+
+/**
+ * A shipment being tracked as an asset on the ledger
+ */
+asset Shipment identified by shipmentId {
+  o String shipmentId
+  --> Product product
+  o ShipmentStatus status
+  o Long unitCount optional // optional field. if not provided, product.unitCount will be used.
+  o TemperatureReading[] temperatureReadings optional
+  // time of shipment arrival as recorded by the shipper. technically required in ARRIVAL state.
+  o DateTime arrival optional
+  --> Contract contract
+}
+
+/**
+ * Defines a contract between a Supplier and an Retailer to ship using
+ * a Shipper, paying a set unit price. The unit price is multiplied by
+ * a penality factor proportional to the deviation from the min and max
+ * negociated temperatures for the shipment.
+ */
+asset Contract identified by contractId {
+  o String contractId
+  --> Supplier supplier
+  --> Shipper shipper optional // shipper is optional since contracts can now be in the INQUIRY state
+  --> Retailer retailer // the buyer
+  o DateTime arrivalDateTime
+  o Long unitCount // unitCount is set from Product
+  o Double unitPrice
+  o Double minTemperature
+  o Double maxTemperature
+  o Double minPenaltyFactor
+  o Double maxPenaltyFactor
+  
+  --> Product product optional
+  // auction data, merged from car auction
+  o ContractState state
+  o Double maxPrice // maximum price the retailer will accept
+  --> Retailer buyer optional // the winning buyer of this product. Once the shipment is complete, this should be cleared and they become the owner.
+  o Bid[] bids optional
+}
+
+// supplier makes a lower shipping bid to the retailer to consider.
+transaction Bid {
+  o Double bidPrice
+  --> Contract contract
+  --> Shipper shipper
+}
+
+// create a contract given a product
+transaction createContract {
+  o String iter // for debugging purposes, ID padding
+  o DateTime arrivalDateTime
+  o Double maxPrice // sets initial unit price
+  o Double minTemperature
+  o Double maxTemperature
+  o Double minPenaltyFactor
+  o Double maxPenaltyFactor
+  o Long unitCount
+  --> Product product
+}
+
+// close a contract to bids given offers
+transaction CloseInquiry {
+  --> Contract inquiry
+}
+
+// create a shipment
+transaction CreateShipment {
+  o String iter // for debugging purposes, ID padding
+  --> Contract contract
+  o Long unitCount optional // optionally set unitCount to allow for multiple shipments of a product
+}
+
+/**
+ * A concept for a simple street address
+ */
+concept Address {
+  o String city optional
+  o String country
+  o String street optional
+  o String zip optional
+}
+
+/**
+ * An abstract participant type in this business network
+ */
+abstract participant Business identified by email {
+  o String email
+  o Address address
+  o Double balance
+}
+
+/**
+ * A Supplier is a type of participant in the network
+ */
+participant Supplier extends Business {
+  // in auctions, supplier is an auctioneer
+}
+
+/**
+ * A Shipper is a type of participant in the network
+ */
+participant Shipper extends Business {
+  // in shipping service auctions, shipper is an auctioneer
+}
+
+/**
+ * An Retailer is a type of participant in the network
+ */
+participant Retailer extends Business {
+  // in auctions, retailer is a buyer
+}
+
+/**
+ * JUST FOR INITIALIZING A DEMO
+ */
+transaction SetupDemo {
+  o String iter // iteration count for ids to avoid duplicate objects
+}

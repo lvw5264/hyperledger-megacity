@@ -1,0 +1,59 @@
+/**
+ * Initial Product Purchase negotiation system.
+ * Currently based on car auction which has multiple competing buyers and one seller per product, 
+ * but we need to do two scenarios instead:
+ * One retailer to one supplier - Inquiry, offer, counteroffer (accept or reject)
+ * One retailer to many supplier - Volume order fill
+ * Also, the product procurement becomes a three stage process: buy product, ship product, recieve product.
+ */
+
+namespace org.acme.product.auction
+import org.acme.shipping.perishable.*
+
+/**
+ * The type of perishable product being shipped
+ */
+enum ProductType {
+  o BANANAS
+  o APPLES
+  o PEARS
+  o PEACHES
+  o COFFEE
+}
+
+/* Business Logic inherited from Car Auction */
+asset Product identified by productId {
+  o String productId
+  o String description
+  o ProductType type
+  --> Supplier supplier // the supplier that manufactured the product
+  --> Business owner // any business can own this product, but that doesn't mean they currently hold it
+  --> Business possessor // possession of the item since the shipper technically possesses it in transit or in warehouse, but has no right to own it.
+  
+  // auction data, merged from productListing
+  o Long unitCount
+  o ListingState state
+  o Double reservePrice
+  --> Retailer buyer optional // the winning buyer of this product. Once the shipment is complete, this should be cleared and they become the owner.
+  o Offer[] offers optional
+}
+
+enum ListingState {
+  o CREATED // created but not yet up for sale
+  o FOR_SALE // supplier offers the product up for sale
+  o RESERVE_NOT_MET
+  o SOLD // sold products are ready to have shipping contracts made
+}
+
+// an offer for the product from a retailer for the supplier to consider
+transaction Offer {
+  o Double bidPrice
+  --> Product listing
+  --> Retailer retailer
+}
+
+// close bidding in a final transaction, with the closebidding function determining the outcome
+// This also should make it available for shipping negotiation
+transaction CloseBidding {
+  --> Product listing
+}
