@@ -1,8 +1,8 @@
 # Blockchain Smart Contracts in Megacity Logistics: Hyperledger Source Code
 <!--
-> Example business network that shows growers, shippers and importers defining contracts for the price of perishable goods, based on temperature readings received for shipping containers.
+> Example business network that shows suppliers, shippers and retailers defining contracts for the price of perishable goods, based on temperature readings received for shipping containers.
 
-The business network defines a contract between growers and importers. The contract stipulates that: On receipt of the shipment the importer pays the grower the unit price x the number of units in the shipment. Shipments that arrive late are free. Shipments that have breached the low temperate threshold have a penalty applied proportional to the magnitude of the breach x a penalty factor. Shipments that have breached the high temperate threshold have a penalty applied proportional to the magnitude of the breach x a penalty factor.
+The business network defines a contract between suppliers and retailers. The contract stipulates that: On receipt of the shipment the retailer pays the supplier the unit price x the number of units in the shipment. Shipments that arrive late are free. Shipments that have breached the low temperate threshold have a penalty applied proportional to the magnitude of the breach x a penalty factor. Shipments that have breached the high temperate threshold have a penalty applied proportional to the magnitude of the breach x a penalty factor.
 -->
 ## Model Definitions
 
@@ -10,20 +10,31 @@ The business network defines a contract between growers and importers. The contr
 
 This business network defines:
 
-**Participants**
-`Grower` `Importer` `Shipper`
+### Participants
 
-**Assets**
-`Contract` `Shipment`
+* `Supplier`
+* `Retailer`
+* `Shipper`
 
-**Transactions**
-`TemperatureReading` `ShipmentReceived` `SetupDemo`
+### Assets
+
+* `Product`
+* `Contract`
+* `Shipment`
+
+### Transactions
+
+* `TemperatureReading`
+* `ShipmentReceived`
+* `SetupDemo`
 
 ## Usage
 
 > Note: Needs to be updated from the perishable network, as it has improved tremendously.
 
 To test this Business Network Definition in the **Test** tab:
+
+### Initialize Assets
 
 Submit a `SetupDemo` transaction:
 
@@ -33,7 +44,9 @@ Submit a `SetupDemo` transaction:
 }
 ```
 
-This transaction populates the Participant Registries with a `Grower`, an `Importer` and a `Shipper`. The Asset Registries will have a `Contract` asset and a `Shipment` asset.
+This transaction populates the Participant Registries with a `Supplier`, an `Retailer` and a `Shipper`. The Asset Registries will have a `Contract` asset and a `Shipment` asset.
+
+### Record Temperature Reading (Shipper)
 
 Submit a `TemperatureReading` transaction:
 
@@ -45,9 +58,11 @@ Submit a `TemperatureReading` transaction:
 }
 ```
 
-If the temperature reading falls outside the min/max range of the contract, the price received by the grower will be reduced. You may submit several readings if you wish. Each reading will be aggregated within `SHIP_001` Shipment Asset Registry.
+If the temperature reading falls outside the min/max range of the contract, the price received by the supplier will be reduced. You may submit several readings if you wish. Each reading will be aggregated within `SHIP_001` Shipment Asset Registry.
 
-Submit a `ShipmentReceived` transaction for `SHIP_001` to trigger the payout to the grower, based on the parameters of the `CON_001` contract:
+### Record Shipment Reciept (Retailer)
+
+Submit a `ShipmentReceived` transaction for `SHIP_001` to trigger the payout to the supplier, based on the parameters of the `CON_001` contract:
 
 ```
 {
@@ -56,9 +71,7 @@ Submit a `ShipmentReceived` transaction for `SHIP_001` to trigger the payout to 
 }
 ```
 
-If the date-time of the `ShipmentReceived` transaction is after the `arrivalDateTime` on `CON_001` then the grower will no receive any payment for the shipment.
-
-Congratulations!
+If the date-time of the `ShipmentReceived` transaction is after the `arrivalDateTime` on `CON_001` then the supplier will not receive any payment for the shipment.
 
 ## Credits
 
