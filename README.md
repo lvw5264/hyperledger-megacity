@@ -31,9 +31,45 @@ The `SetupDemo` transaction is a special transaction for debugging purposes. It 
 ```
 {
   "$class": "org.acme.shipping.perishable.SetupDemo",
-  "iter": "001"
+  "iter": "001"### `Dock`: Shipper Informs Possessor of Arrival
 }
 ```
+
+## Product Bidding Transactions
+
+### `createProduct` Create a Contract for a SOLD Product
+
+### `Offer`
+
+### `CloseBidding` 
+
+## Contract Bidding Transactions
+
+### `createContract` Create a Contract for a SOLD Product
+
+### `Bid`
+
+### `CloseInquiry`: Execute the Contract
+
+## Shipment Transactions
+
+Transactions related to the shipment process.
+
+### `CreateShipment` Begin a Shipment for a Contract that is `READY_FOR_PICKUP`
+
+### `Dock`: Shipper Informs Possessor of Arrival
+
+### `HandOff`: Change Product Possession to Shipper
+
+### `PickUp`: Confirm Product Possession and Move Out
+
+### `Arrive`: Record Shipper Arrival at Retailer
+
+### `TemperatureReading`: Record Temperature Reading (Shipper)
+
+### `ShipmentReceived`: Record Shipment Reciept (Retailer)
+
+## Access Control Rules
 
 ## Credits
 
