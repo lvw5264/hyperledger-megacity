@@ -16,9 +16,9 @@ import org.acme.shipping.perishable.*
 enum ProductType {
   o BANANAS
   o APPLES
-  o PEARS
-  o PEACHES
-  o COFFEE
+  o CHERIMOYAS
+  o GRAPES
+  o MILK
 }
 
 /* Business Logic inherited from Car Auction */

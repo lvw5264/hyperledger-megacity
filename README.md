@@ -1,77 +1,39 @@
 # Blockchain Smart Contracts in Megacity Logistics: Hyperledger Source Code
-<!--
-> Example business network that shows suppliers, shippers and retailers defining contracts for the price of perishable goods, based on temperature readings received for shipping containers.
 
-The business network defines a contract between suppliers and retailers. The contract stipulates that: On receipt of the shipment the retailer pays the supplier the unit price x the number of units in the shipment. Shipments that arrive late are free. Shipments that have breached the low temperate threshold have a penalty applied proportional to the magnitude of the breach x a penalty factor. Shipments that have breached the high temperate threshold have a penalty applied proportional to the magnitude of the breach x a penalty factor.
--->
+This code defines a Hyperledger Business Network for Suppliers, Shippers, and Retailers to list products for sale, list shipment contracts for bid, negotiate pricing for the contract, and create contracts that shipments are generated upon, with temperature readings to be recorded.
+
+The contract is a smart contract as specified by the Hyperledger Perishable Goods Network, with auction functions implemented atop it.
+
+Download this github source code as a zip. Then, rename the file extension to `.bna` (Business Network Definition package), and upload the file to Hyperledger Composer Playground as a new Business Network. The code can then be explored in the **Define** tab.
+
+In the **Test** tab, the transactions can be made upon any assets created.
+
 ## Model Definitions
-
-> Note: Needs to be updated from the perishable network, as it has improved tremendously.
 
 This business network defines:
 
 ### Participants
 
-* `Supplier`
-* `Retailer`
-* `Shipper`
+* `Supplier` - Produces/Procures/Supplies the product for retailers. Could be farmers, food packers, or manufacturers.
+* `Shipper`/Logistics Provider - Transports items between suppliers and retailers (and if necessary, return them to sender).
+* `Retailer` - Purchases and receives products.
 
 ### Assets
 
-* `Product`
-* `Contract`
-* `Shipment`
+* `Product` - A product to be sold by a supplier to a retailer.
+* `Contract` - A contract between a supplier, shipper, and retailer to handoff, transport, and deliver the product for the retailer.
+* `Shipment` - A derivative asset of the contract. There could possibly be multiple shipments to various different locations.
 
-### Transactions
+### `SetupDemo` Initialize Assets
 
-* `TemperatureReading`
-* `ShipmentReceived`
-* `SetupDemo`
-
-## Usage
-
-> Note: Needs to be updated from the perishable network, as it has improved tremendously.
-
-To test this Business Network Definition in the **Test** tab:
-
-### Initialize Assets
-
-Submit a `SetupDemo` transaction:
+The `SetupDemo` transaction is a special transaction for debugging purposes. It sets up a `Retailer`, `Shipper`, and `Supplier` as well as one product, contract, and shipment each in the asset registry. There is an iteration string `001` that will be appended to each asset ID for easy referencing.
 
 ```
 {
-  "$class": "org.acme.shipping.perishable.SetupDemo"
+  "$class": "org.acme.shipping.perishable.SetupDemo",
+  "iter": "001"
 }
 ```
-
-This transaction populates the Participant Registries with a `Supplier`, an `Retailer` and a `Shipper`. The Asset Registries will have a `Contract` asset and a `Shipment` asset.
-
-### Record Temperature Reading (Shipper)
-
-Submit a `TemperatureReading` transaction:
-
-```
-{
-  "$class": "org.acme.shipping.perishable.TemperatureReading",
-  "centigrade": 8,
-  "shipment": "resource:org.acme.shipping.perishable.Shipment#SHIP_001"
-}
-```
-
-If the temperature reading falls outside the min/max range of the contract, the price received by the supplier will be reduced. You may submit several readings if you wish. Each reading will be aggregated within `SHIP_001` Shipment Asset Registry.
-
-### Record Shipment Reciept (Retailer)
-
-Submit a `ShipmentReceived` transaction for `SHIP_001` to trigger the payout to the supplier, based on the parameters of the `CON_001` contract:
-
-```
-{
-  "$class": "org.acme.shipping.perishable.ShipmentReceived",
-  "shipment": "resource:org.acme.shipping.perishable.Shipment#SHIP_001"
-}
-```
-
-If the date-time of the `ShipmentReceived` transaction is after the `arrivalDateTime` on `CON_001` then the supplier will not receive any payment for the shipment.
 
 ## Credits
 
